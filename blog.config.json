@@ -7,21 +7,25 @@
     "language": "ja"
   },
   "publish": {
-    "mode": "direct",
     "timezone": "Asia/Tokyo",
     "dayStartHour": 4,
     "allowedAuthors": [],
     "publishedLabel": "published",
     "skipLabels": ["draft", "no-blog"],
-    "systemLabels": ["published", "draft", "no-blog", "meta"],
-    "prBranch": "blog/publish"
+    "systemLabels": ["published", "draft", "no-blog"],
+    "lookbackDays": 14
   },
   "ai": {
-    "provider": "github-models",
-    "model": "openai/gpt-4.1",
-    "temperature": 0.8,
+    "provider": "claude-code",
+    "model": "",
     "rewriteLevel": "medium",
-    "lintRetries": 1
+    "sampleMaxChars": 6000,
+    "fallback": {
+      "provider": "github-models",
+      "model": "openai/gpt-4.1",
+      "temperature": 0.8,
+      "lintRetries": 1
+    }
   },
   "images": {
     "maxWidth": 1600,

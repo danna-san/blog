@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{pageTitle}}</title>
+<meta name="description" content="{{description}}">
+<link rel="canonical" href="{{canonical}}">
+<meta property="og:type" content="{{ogType}}">
+<meta property="og:title" content="{{pageTitle}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:url" content="{{canonical}}">
+<meta property="og:site_name" content="{{siteName}}">
+<meta property="og:image" content="{{ogImage}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="light dark">
+<meta name="blog-root" content="../docs/">
+<link rel="stylesheet" href="../docs/assets/css/style.css?v={{v}}">
+<link rel="alternate" type="application/atom+xml" title="{{siteName}}" href="../docs/feed.xml">
+<script>
+  // JS が動くことと保存されたテーマを、描画前に反映する（ちらつき防止）
+  document.documentElement.classList.add('js');
+  try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<script src="../docs/assets/js/app.js?v={{v}}" defer></script>
+</head>
+<!--#
+  このファイルは全ページ共通のテンプレートです。ブラウザで直接開くとサンプル記事入りで見えます。
+  ・<!-\-@名前-\->…<!-\-/@名前-\-> の区間はビルド時に差し替えられます（中身はサンプル）。
+  ・{{名前}} はビルド時に値が入ります。
+  ・"../docs/" はビルド時にサイトのルートからの相対パスに置き換わります。
+  ・確認は npm run serve → http://localhost:8080/templates/layout.html がおすすめです。
+  ・「<!-\-#」で始まるこの説明コメントはビルド時に取り除かれます。
+-->
+<body data-page="{{pageType}}" data-date="{{date}}">
+<a class="skip-link" href="#main">本文へ移動</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <button class="icon-button menu-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="メニューを開く">
+      <span class="menu-icon" aria-hidden="true"></span>
+    </button>
+    <div class="brand">
+      <a class="site-title" href="../docs/index.html"><!--@siteTitle-->だんなさんの日々<!--/@siteTitle--></a>
+      <p class="site-desc"><!--@siteDescription-->なんでもない毎日のこと。<!--/@siteDescription--></p>
+    </div>
+    <button class="icon-button theme-toggle" type="button" aria-label="明るさを切り替える">
+      <span class="theme-icon" aria-hidden="true"></span>
+    </button>
+  </div>
+  <nav class="tag-bar" aria-label="よく使うタグ">
+    <ul class="tag-nav" id="tag-nav"><!--@tagNav-->
+      <li><a class="tag" href="#">#散歩</a></li>
+      <li><a class="tag" href="#">#ラーメン</a></li>
+      <li><a class="tag" href="#">#こども</a></li>
+      <li><a class="tag" href="#">#読書</a></li>
+      <li><a class="tag" href="#">#週末</a></li>
+    <!--/@tagNav--></ul>
+  </nav>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="日付から探す">
+    <div class="sidebar-inner">
+      <h2 class="sidebar-title">日付から探す</h2>
+      <div class="archive-tree" id="archive-tree"><!--@archiveTree-->
+        <details class="tree-year" open><summary>2026年 <span class="count">3</span></summary>
+          <details class="tree-month" open><summary>11月 <span class="count">3</span></summary>
+            <ul class="tree-days">
+              <li><a href="#">7日（土）秋の公園で</a></li>
+              <li><a href="#" aria-current="page">6日（金）雨の金曜日</a></li>
+              <li><a href="#">5日（木）新しいノート</a></li>
+            </ul>
+          </details>
+        </details>
+      <!--/@archiveTree--></div>
+      <p class="sidebar-links">
+        <a href="../docs/archive.html">すべての日記</a>
+        <a href="../docs/tags.html">タグ</a>
+        <a href="../docs/feed.xml">RSS</a>
+      </p>
+    </div>
+  </aside>
+  <div class="overlay" hidden></div>
+
+  <main class="content" id="main" tabindex="-1"><!--@main-->
+    <article class="post" data-date="2026-11-06">
+      <header class="post-header reveal">
+        <p class="post-date"><time datetime="2026-11-06">2026年11月6日（金）</time></p>
+        <h1 class="post-title">雨の金曜日</h1>
+        <ul class="post-tags"><li><a class="tag" href="#">#散歩</a></li><li><a class="tag" href="#">#ラーメン</a></li></ul>
+      </header>
+      <div class="timeline">
+        <section class="entry reveal" id="e1">
+          <div class="entry-meta"><time class="entry-time" datetime="2026-11-06T00:20:00Z">09:20</time></div>
+          <div class="entry-content">
+            <h2 class="entry-heading">朝の散歩</h2>
+            <p>朝から細かい雨。傘をさすほどでもないかと思って出たら、結局ずっと降っていた。</p>
+            <p>川沿いの道は人が少なくて、カモが三羽だけ並んで泳いでいた。</p>
+            <figure class="media"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23a5b4c4'/%3E%3Cstop offset='1' stop-color='%23d9c8b4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="" width="1200" height="800" loading="lazy"></figure>
+          </div>
+        </section>
+        <section class="entry reveal" id="e2">
+          <div class="entry-meta"><time class="entry-time" datetime="2026-11-06T03:40:00Z">12:40</time></div>
+          <div class="entry-content">
+            <h2 class="entry-heading">いつもの店</h2>
+            <p>昼はいつもの店で味噌ラーメン。雨の日は空いているからいい。<br>麺がちょっと変わった気がするけど、気のせいかもしれない。</p>
+          </div>
+        </section>
+        <section class="entry reveal" id="e3">
+          <div class="entry-meta"><time class="entry-time is-note" datetime="2026-11-06T18:59:00Z">追記</time></div>
+          <div class="entry-content">
+            <p>あとで聞いたら、やっぱり麺は変わっていたらしい。</p>
+          </div>
+        </section>
+      </div>
+      <div class="post-closing reveal"><p>夜には雨がやんでいた。</p></div>
+      <nav class="post-nav" id="post-nav" aria-label="前後の日記">
+        <a class="post-nav-link prev" href="#"><span class="post-nav-label">前の日</span><span class="post-nav-title">11/5 新しいノート</span></a>
+        <a class="post-nav-link next" href="#"><span class="post-nav-label">次の日</span><span class="post-nav-title">11/7 秋の公園で</span></a>
+      </nav>
+    </article>
+  <!--/@main--></main>
+</div>
+
+<footer class="site-footer"><p><!--@footer-->&copy; 2026 danna-san<!--/@footer--></p></footer>
+<button class="to-top" type="button" aria-label="ページの先頭へ戻る" hidden>↑</button>
+</body>
+</html>

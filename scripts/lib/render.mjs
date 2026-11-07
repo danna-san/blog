@@ -24,7 +24,7 @@ export function renderPostMain(post) {
   const entries = post.entries.map((e) => {
     const body = e.blocks.map((b) => (b.type === 'text' ? renderParagraphs(b.text) : mediaHtml(b))).join('\n');
     return `<section class="entry reveal" id="${esc(e.id)}">
-  <div class="entry-meta"><time class="entry-time" datetime="${esc(e.createdAt || '')}">${esc(e.time)}</time></div>
+  <div class="entry-meta"><time class="entry-time${e.label === '追記' ? ' is-note' : ''}" datetime="${esc(e.at || '')}">${esc(e.label)}</time></div>
   <div class="entry-content">
     ${e.heading ? `<h2 class="entry-heading">${esc(e.heading)}</h2>` : ''}
     ${body}

@@ -5,7 +5,8 @@
 import { esc } from './html.mjs';
 
 export function fillTemplate(tpl, { vars = {}, slots = {}, root = './' } = {}) {
-  let out = tpl.replace(/<!--@([\w-]+)-->[\s\S]*?<!--\/@\1-->/g, (all, name) => (name in slots ? slots[name] : all));
+  let out = tpl.replace(/<!--#[\s\S]*?-->\n?/g, '');
+  out = out.replace(/<!--@([\w-]+)-->[\s\S]*?<!--\/@\1-->/g, (all, name) => (name in slots ? slots[name] : all));
   out = out.replace(/\{\{([\w-]+)\}\}/g, (all, name) => (name in vars ? esc(vars[name]) : ''));
   return out.split('../docs/').join(root);
 }

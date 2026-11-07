@@ -47,3 +47,37 @@ export function japaneseDate(dateStr) {
   const w = WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
   return `${y}年${m}月${d}日（${w}）`;
 }
+
+/** タイムゾーン tz における「dateStr の hh:mm」を UTC の Date にする */
+export function zonedToUtc(dateStr, hh, mm, tz) {
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const target = Date.UTC(y, mo - 1, d, hh, mm);
+  let t = target;
+  for (let i = 0; i < 3; i++) {
+    const p = partsInTz(t, tz);
+    const seen = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
+    const diff = seen - target;
+    if (diff === 0) break;
+    t -= diff;
+  }
+  return new Date(t);
+}
+
+/** 日記上の日付 dateStr の「HH:MM」を実際の日時にする。区切り時刻より前・24時以降は深夜（翌暦日）扱い */
+export function diaryTimeToUtc(dateStr, hh, mm, tz, dayStartHour) {
+  let day = dateStr;
+  let h = hh;
+  if (h >= 24) { h -= 24; day = addDays(dateStr, 1); }
+  else if (h < dayStartHour) { day = addDays(dateStr, 1); }
+  return zonedToUtc(day, h, mm, tz);
+}
+
+/** 日記上の日付 dateStr の最後の瞬間（次の区切り時刻の 1 分前） */
+export function endOfDiaryDay(dateStr, tz, dayStartHour) {
+  return new Date(zonedToUtc(addDays(dateStr, 1), dayStartHour, 0, tz).getTime() - 60_000);
+}
+
+export function shortDate(dateStr) {
+  const [, m, d] = dateStr.split('-').map(Number);
+  return `${m}/${d}`;
+}

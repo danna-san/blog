@@ -69,6 +69,8 @@ export function buildSite({ contentDir, outDir, templatesDir, config, log = cons
         siteTitle: esc(config.site.title),
         siteDescription: esc(config.site.description),
         main,
+        tagNav: '',
+        archiveTree: '<noscript><p><a href="archive.html">すべての日記</a></p></noscript>',
         footer: `&copy; ${year} ${esc(config.site.author || config.site.title)}`,
       },
       root: '',

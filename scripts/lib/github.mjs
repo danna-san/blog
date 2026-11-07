@@ -52,10 +52,5 @@ export function createGitHub({ token = process.env.GITHUB_TOKEN, repository = pr
       try { await call('POST', `${base}/labels`, { name, color, description }); }
       catch (e) { if (e.status !== 422) throw e; } // 422 = 既に存在
     },
-    async upsertPullRequest({ head, base: baseBranch, title, body }) {
-      const open = await call('GET', `${base}/pulls?state=open&head=${owner}:${encodeURIComponent(head)}`);
-      if (open.length) return call('PATCH', `${base}/pulls/${open[0].number}`, { title, body });
-      return call('POST', `${base}/pulls`, { head, base: baseBranch, title, body });
-    },
   };
 }
