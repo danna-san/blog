@@ -46,7 +46,8 @@ export function extractDirective(body) {
   const idx = lines.findIndex((l) => l.trim() !== '');
   if (idx < 0) return { directive: null, body: text };
   const m = lines[idx].trim().match(LINE);
-  if (!m) return { directive: null, body: text };
+  // 日付・時刻らしい書き出しのときだけ日付指定とみなす（「@tanaka よろしく」のようなメンションは本文のまま）
+  if (!m || !/^(\d|今日|昨日|一昨日|おととい)/.test(m[1])) return { directive: null, body: text };
   lines.splice(idx, 1);
   return { directive: { line: m[0], token1: m[1], token2: m[2] || null }, body: lines.join('\n') };
 }

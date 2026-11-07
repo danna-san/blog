@@ -33,6 +33,14 @@ function output(name, value) {
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `${name}=${String(value).replace(/\n/g, ' ')}\n`);
 }
 
+/** claude-code-action に渡す引数。許可するツールは最小限（R12.2） */
+export function claudeArgs(config) {
+  const tools = ['Read', 'Write', 'Skill', 'Bash(python3 .claude/skills/yomiyasu/scripts/yomiyasu_lint.py:*)'];
+  const model = String(config.ai.model || '').trim();
+  if (model && !/^[\w.:\[\]-]+$/.test(model)) throw new Error(`ai.model に使えない文字があります: ${model}`);
+  return `--allowedTools "${tools.join(',')}"${model ? ` --model ${model}` : ''}`;
+}
+
 /** きっかけ（イベント）から処理モードを決める */
 export function decideMode(env, args, { allowed }) {
   if (args.mode) return { mode: args.mode, date: args.date || null };
@@ -74,6 +82,9 @@ async function main() {
     await prepare({ gh: client, config, contentDir, outDir, workDir, fixtureDir, collected });
     output('has_work', 'true');
     output('dates', collected.days.map((d) => d.date).join(' '));
+    output('ai_provider', config.ai.provider);
+    output('request_files', collected.days.map((d) => `.tmp/ai/requests/${d.date}.md`).join(' '));
+    output('claude_args', claudeArgs(config));
     if (cmd === 'prepare') return;
   }
 

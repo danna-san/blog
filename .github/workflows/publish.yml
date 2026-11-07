@@ -1,0 +1,117 @@
+# Issue から日記を組み立てて公開する。
+# - 毎朝 6:00（JST）に前日までの未公開分
+# - 書き手が Issue に「/publish」とコメントしたとき（当日分も含む）、「/publish YYYY-MM-DD」でその日を作り直し
+# - Actions 画面からの手動実行
+# 外部入力（コメント本文など）は env 経由で渡し、シェルに直接埋め込まない。
+name: publish
+
+on:
+  schedule:
+    - cron: '0 21 * * *' # UTC 21:00 = JST 6:00（数十分遅れることがある）
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'この日の記事を作り直す（YYYY-MM-DD）。空なら未公開分を公開'
+        required: false
+        default: ''
+      include_today:
+        description: '当日分も含める'
+        type: boolean
+        default: false
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write # 記事のコミット
+  issues: write   # ラベル付けとクローズ
+  models: read    # GitHub Models（予備の文章生成）
+
+concurrency:
+  group: blog-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # コメントのときは「/publish で始まる」「PR ではない」「書き込み権限のある人」だけ。書き手かどうかはスクリプトでも確かめる
+    if: >-
+      github.event_name != 'issue_comment' ||
+      (startsWith(github.event.comment.body, '/publish') &&
+       !github.event.issue.pull_request &&
+       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: ImageMagick を用意
+        run: command -v magick >/dev/null || command -v convert >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick)
+
+      - name: 素材を集める
+        id: prepare
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          INPUT_DATE: ${{ inputs.date }}
+          INPUT_INCLUDE_TODAY: ${{ inputs.include_today }}
+        run: node scripts/publish.mjs prepare
+
+      - name: 文章を書く（Claude）
+        id: claude
+        if: steps.prepare.outputs.has_work == 'true' && steps.prepare.outputs.ai_provider == 'claude-code'
+        continue-on-error: true # 失敗しても次のステップで GitHub Models に切り替える
+        timeout-minutes: 25
+        uses: anthropics/claude-code-action@a26b07d8c778b0c43f64618e5fd29fd0f8af72e8 # v1.0.250
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }} # Claude GitHub App を使わない
+          show_full_output: 'false'
+          display_report: 'false'
+          claude_args: ${{ steps.prepare.outputs.claude_args }}
+          prompt: |
+            次の依頼ファイルを 1 つずつ読み、それぞれの指示どおりに日記を書いてください。
+            依頼ファイル: ${{ steps.prepare.outputs.request_files }}
+            結果は依頼ファイルに書かれた .tmp/ai/responses/<日付>.json にだけ書き込み、ほかのファイルは作ったり変えたりしないでください。
+            GitHub への投稿やコメントはしないでください。
+
+      - name: 記事とサイトを組み立てる
+        id: compose
+        if: steps.prepare.outputs.has_work == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/publish.mjs compose
+
+      - name: コミットして push
+        id: push
+        if: steps.compose.outputs.published != ''
+        env:
+          MESSAGE: ${{ steps.compose.outputs.commit_message }}
+          OWNER: ${{ github.repository_owner }}
+          OWNER_ID: ${{ github.repository_owner_id }}
+        run: |
+          git config user.name "$OWNER"
+          git config user.email "${OWNER_ID}+${OWNER}@users.noreply.github.com"
+          git add content docs
+          if git diff --cached --quiet; then echo "変更はありません"; exit 0; fi
+          git commit -q -m "$MESSAGE"
+          for i in 1 2 3 4; do
+            if git pull -q --rebase && git push -q; then exit 0; fi
+            sleep $((i * 5))
+          done
+          echo "::error::push に失敗しました"
+          exit 1
+
+      - name: Issue を閉じる
+        if: steps.push.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/publish.mjs finalize
+
+      - name: 失敗した日を知らせる
+        if: steps.compose.outputs.failed != ''
+        env:
+          FAILED: ${{ steps.compose.outputs.failed }}
+        run: |
+          echo "::error::文章を生成できなかった日があります: $FAILED（Issue は開いたままです。次回の実行か /publish で再挑戦します）"
+          exit 1

@@ -1,0 +1,46 @@
+# テンプレート・CSS・JS・設定・記事データが変わったら、AI を呼ばずに全ページを作り直す。
+# GITHUB_TOKEN による push はワークフローを起動しないので、publish との間でループしない。
+name: rebuild
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'templates/**'
+      - 'docs/assets/css/**'
+      - 'docs/assets/js/**'
+      - 'content/**'
+      - 'scripts/**'
+      - 'blog.config.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: blog-publish
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - run: npm test
+      - run: node scripts/build.mjs
+      - name: コミットして push
+        env:
+          OWNER: ${{ github.repository_owner }}
+          OWNER_ID: ${{ github.repository_owner_id }}
+        run: |
+          git config user.name "$OWNER"
+          git config user.email "${OWNER_ID}+${OWNER}@users.noreply.github.com"
+          git add docs
+          if git diff --cached --quiet; then echo "変更はありません"; exit 0; fi
+          git commit -q -m "表示を整えた"
+          for i in 1 2 3 4; do
+            if git pull -q --rebase && git push -q; then exit 0; fi
+            sleep $((i * 5))
+          done
+          exit 1

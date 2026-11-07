@@ -194,6 +194,7 @@ a:hover { text-decoration-thickness: 2px; }
 .tree-days a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 .sidebar-links { margin: 24px 0 0; padding-top: 16px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .85rem; }
 .overlay { display: none; }
+.overlay[hidden] { display: none !important; }
 
 /* ---------- 記事 ---------- */
 .post-header { margin-bottom: 40px; }
@@ -203,15 +204,15 @@ a:hover { text-decoration-thickness: 2px; }
 
 .timeline { position: relative; }
 .timeline::before {
-  content: ""; position: absolute; left: 52px; top: 8px; bottom: 8px;
+  content: ""; position: absolute; left: 72px; top: 8px; bottom: 8px;
   width: 1px; background: var(--line);
 }
-.entry { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 0 28px; padding-bottom: 40px; position: relative; }
+.entry { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 0 36px; padding-bottom: 40px; position: relative; }
 .entry-meta { text-align: right; padding-top: 2px; }
 .entry-time { font-size: .82rem; color: var(--text-sub); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 .entry-time.is-note { font-size: .75rem; color: var(--accent); }
 .entry::after {
-  content: ""; position: absolute; left: 48px; top: 11px;
+  content: ""; position: absolute; left: 68px; top: 11px;
   width: 9px; height: 9px; border-radius: 50%;
   background: var(--bg); border: 2px solid var(--accent);
 }
@@ -223,11 +224,14 @@ a:hover { text-decoration-thickness: 2px; }
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   background: var(--surface-2);
-  width: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: min(78vh, 680px); /* 縦長の写真が画面を占領しないように */
+  margin: 0 auto;
 }
 .media img { cursor: zoom-in; transition: transform .4s var(--ease), box-shadow .4s var(--ease); }
 .media img:hover { transform: translateY(-2px); }
-.post-closing { margin: 8px 0 0 80px; padding: 20px 24px; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--line); color: var(--text-sub); }
+.post-closing { margin: 8px 0 0 92px; padding: 20px 24px; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--line); color: var(--text-sub); }
 .post-closing p { margin: 0; }
 
 .post-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 56px; }

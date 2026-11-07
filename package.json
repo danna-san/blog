@@ -10,7 +10,7 @@
     "publish:dry": "node scripts/publish.mjs --dry-run",
     "preview": "node scripts/preview.mjs",
     "serve": "node scripts/serve.mjs",
-    "test": "node --test tests/",
+    "test": "node --test tests/*.test.mjs",
     "reset-content": "node scripts/reset-content.mjs"
   },
   "dependencies": {},

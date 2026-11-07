@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>だんなさんの日々</title>
+  <link href="https://danna-san.github.io/blog/"/>
+  <link rel="self" href="https://danna-san.github.io/blog/feed.xml"/>
+  <id>https://danna-san.github.io/blog/</id>
+  <updated>2026-11-07T17:40:46.227Z</updated>
+  <author><name>danna-san</name></author>
+
+</feed>

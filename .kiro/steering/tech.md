@@ -24,7 +24,7 @@
 ## セキュリティ方針
 
 - 秘密情報は GitHub の Secrets にだけ置く（`CLAUDE_CODE_OAUTH_TOKEN`）。設定ファイル・コード・ログに書かない。
-- Claude に許可するツールは Read / Write と、yomiyasu の lint スクリプトの実行だけ。任意のコマンド実行（Bash 全般）は許可しない。
+- Claude に許可するツールは Read / Write / Skill（yomiyasu を呼ぶため）と、yomiyasu の lint スクリプトの実行だけ。任意のコマンド実行（Bash 全般）は許可しない。許可リストは `scripts/publish.mjs` の `claudeArgs()` にある。
 - AI に渡すのは、許可した書き手（既定はリポジトリ所有者）が書いた Issue とコメントだけ。他人の文章はプロンプトに入れない。
 - `/publish` コマンドに反応するのは許可した書き手のコメントだけ。ワークフローの `if` とスクリプトの両方で確かめる。
 - Issue 本文などの外部入力は環境変数経由で渡し、`${{ }}` でシェルに直接埋め込まない。

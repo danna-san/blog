@@ -35,13 +35,14 @@ flowchart LR
 
 1. `actions/checkout`（SHA 固定）
 2. ImageMagick が無ければ `apt-get install imagemagick`
-3. `node scripts/publish.mjs prepare` … `has_work` を出力。外部入力は `env:` で渡す（`COMMENT_BODY`、`COMMENT_AUTHOR`、`INPUT_DATE` など）。
+3. `node scripts/publish.mjs prepare` … `has_work`、`ai_provider`、`request_files`、`claude_args` を出力。外部入力は `env:` で渡す（`COMMENT_BODY`、`COMMENT_AUTHOR`、`INPUT_DATE` など）。
 4. `anthropics/claude-code-action`（SHA 固定、`has_work == 'true'` のとき、`continue-on-error: true`）
    - `claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}`
    - `github_token: ${{ secrets.GITHUB_TOKEN }}`（Claude GitHub App と OIDC を使わない）
-   - `claude_args: --allowedTools "Read,Write,Bash(python3 .claude/skills/yomiyasu/scripts/yomiyasu_lint.py:*)"`、`ai.model` があれば `--model`
+   - `claude_args`: prepare が出力する（`--allowedTools "Read,Write,Skill,Bash(python3 .claude/skills/yomiyasu/scripts/yomiyasu_lint.py:*)"`、`ai.model` があれば `--model`）
    - `show_full_output: false`、`display_report: false`
-   - prompt: 「`.tmp/ai/requests/*.md` を 1 つずつ処理し、同名の `.tmp/ai/responses/<date>.json` に JSON だけを書く。他のファイルは変更しない。」
+   - prompt: prepare が出力した依頼ファイルの一覧（`request_files`）を 1 つずつ処理し、`.tmp/ai/responses/<date>.json` に JSON だけを書く。他のファイルは変更しない。GitHub に投稿しない。
+   - バージョンは公開から 2 週間以上たったものを選んで SHA で固定する（導入時: v1.0.250）。
 5. `node scripts/publish.mjs compose` … `published`（日付一覧）と `failed`（日付一覧）を出力
 6. 変更があれば commit & push。作者は `${{ github.repository_owner }}` / `<owner_id>+<owner>@users.noreply.github.com`。メッセージは `11/7 の日記`（複数日なら `11/6, 11/7 の日記`、作り直しは `11/5 の日記を更新`）。
 7. push 成功時のみ `node scripts/publish.mjs finalize`
@@ -50,7 +51,7 @@ flowchart LR
 ### 2.2 rebuild.yml
 
 - on: push to `main`（paths: `templates/**`, `docs/assets/css/**`, `docs/assets/js/**`, `blog.config.json`, `content/**`, `scripts/**`）、`workflow_dispatch`
-- `node scripts/build.mjs` → 差分があれば commit & push。
+- `npm test` → `node scripts/build.mjs` → 差分があれば commit & push（メッセージ「表示を整えた」）。
 - `GITHUB_TOKEN` による push は他のワークフローを起動しないため、publish → rebuild の連鎖や無限ループは起きない。
 
 ### 2.3 ci.yml
@@ -221,6 +222,15 @@ flowchart LR
 | GitHub Models の無料枠（1 回あたりの入力トークン上限）に収まるか | 長い日の fixture で文字数を見積もる | 素材が長い日は予備生成を諦めて失敗扱いにする |
 | ImageMagick がランナーに入っているか | ワークフローで確認し、無ければ apt で入れる | JS の GPS 除去だけにする |
 | cron の遅延 | 運用で確認 | 6:00 ちょうどは保証しないと README に書く |
+| `issue_comment` で起動したとき、claude-code-action が Issue に進捗コメントを書かないか（`prompt` 指定時は自動化モードになるはず） | 初回の `/publish` で確認 | 書くようなら `use_sticky_comment` などの設定か、prompt の指示で抑える |
+| Skill ツールで yomiyasu を呼べるか（許可リストの書き方） | 初回実行のログ | 依頼ファイルにある「SKILL.md を Read して推敲」の手順で代わりにする |
+
+### 6.1 実装で決めた細部
+
+- 日付指定の行は、数字か「今日・昨日・一昨日・おととい」で始まるときだけ日付指定とみなす（`@tanaka よろしく` のようなメンションを消さないため）。
+- 日付指定が読めない・未来のときは指定を無視するが、その行は記事に出さない（書き間違いの可能性が高いため）。
+- 生成に失敗した日でも、ダウンロード済みの写真は `docs/assets/media/` に残ってコミットされる（次回の再挑戦で再利用する。元の Issue でも公開されている写真）。
+- 縦長の写真は、画面の高さの 78%（最大 680px）までに収める。
 
 ## 7. テスト
 

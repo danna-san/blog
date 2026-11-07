@@ -34,7 +34,7 @@
 - **Actions はコミット SHA で固定する**（`uses: owner/action@<sha> # vX.Y.Z`）。
 - **秘密情報をファイル・ログ・コミットに書かない。** `blog.config.json` にも書かない。
 - **Issue のタイトルや本文などの外部入力を `${{ }}` でシェルに直接埋め込まない。** `env:` 経由で渡す。
-- **書き手以外の文章を AI に渡さない。** Claude に許可するツールを広げない（Read / Write / yomiyasu の lint だけ）。
+- **書き手以外の文章を AI に渡さない。** Claude に許可するツールを広げない（Read / Write / Skill / yomiyasu の lint だけ。`scripts/publish.mjs` の `claudeArgs()`）。
 - **生成物（`docs/*.html`、`docs/data/`、`docs/assets/media/`、feed、sitemap）を手で編集しない。** テンプレート・CSS・JS・`content/posts/*.json` を直して `npm run build` する。
 - **文章の個性に関わる内容をコードに書かない。** `config/persona.md`、`config/samples/`、`config/banned-phrases.txt` で扱う。
 - **`.claude/skills/yomiyasu/` の中身を書き換えない。** 更新手順は同ディレクトリの `VENDORED.md`。

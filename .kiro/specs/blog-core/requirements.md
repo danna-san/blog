@@ -113,7 +113,7 @@
 ## R12 セキュリティ
 
 - R12.1 秘密情報は GitHub Secrets にだけ置き、リポジトリのファイルとログに出さない。
-- R12.2 Claude に許可するツールは Read、Write、yomiyasu の lint スクリプトの実行だけとする。
+- R12.2 Claude に許可するツールは Read、Write、Skill（yomiyasu の呼び出し）、yomiyasu の lint スクリプトの実行だけとする。
 - R12.3 `/publish` コメントによる実行は、書き手のコメントのときだけ行う（ワークフローとスクリプトの二重確認）。
 - R12.4 外部入力（Issue のタイトル・本文・コメント）をワークフローのシェルに直接埋め込まない。
 - R12.5 利用する Actions はコミット SHA で固定する。
