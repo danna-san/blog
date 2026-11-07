@@ -1,0 +1,18 @@
+{
+  "name": "issue-diary-blog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GitHub Issues を日記の下書きにして、GitHub Actions で静的ブログを組み立てる仕組み",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "publish:dry": "node scripts/publish.mjs --dry-run",
+    "preview": "node scripts/preview.mjs",
+    "serve": "node scripts/serve.mjs",
+    "test": "node --test tests/",
+    "reset-content": "node scripts/reset-content.mjs"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

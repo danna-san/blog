@@ -1,0 +1,36 @@
+{
+  "site": {
+    "title": "だんなさんの日々",
+    "description": "なんでもない毎日のこと。",
+    "author": "danna-san",
+    "baseUrl": "https://danna-san.github.io/blog",
+    "language": "ja"
+  },
+  "publish": {
+    "mode": "direct",
+    "timezone": "Asia/Tokyo",
+    "dayStartHour": 4,
+    "allowedAuthors": [],
+    "publishedLabel": "published",
+    "skipLabels": ["draft", "no-blog"],
+    "systemLabels": ["published", "draft", "no-blog", "meta"],
+    "prBranch": "blog/publish"
+  },
+  "ai": {
+    "provider": "github-models",
+    "model": "openai/gpt-4.1",
+    "temperature": 0.8,
+    "rewriteLevel": "medium",
+    "lintRetries": 1
+  },
+  "images": {
+    "maxWidth": 1600,
+    "quality": 82,
+    "maxVideoMB": 25
+  },
+  "ui": {
+    "headerTagCount": 12,
+    "indexPostCount": 10,
+    "feedPostCount": 20
+  }
+}

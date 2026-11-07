@@ -1,0 +1,6 @@
+node_modules/
+.preview/
+.tmp/
+.publish-result.json
+*.log
+.DS_Store
